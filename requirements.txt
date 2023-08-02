@@ -1,6 +1,6 @@
-matplotlib
+streamlit
 pandas
-scikit-learn
+matplotlib
 seaborn
-
-# Add other required packages here
+numpy
+scikit-learn
