@@ -1,4 +1,6 @@
 matplotlib
 pandas
 scikit-learn
+seaborn
+
 # Add other required packages here
