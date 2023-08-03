@@ -143,6 +143,7 @@ def main():
                     numerical_cols = car.select_dtypes(include=[np.number]).columns
                     correlation_matrix = car[numerical_cols].corr()
                     st.write("##### Correlation Matrix :")
+                    st.write('**Correlation Data:** ' + str(correlation_matrix.shape[0]) + ' rows and ' + str(correlation_matrix.shape[1]) + ' columns.')
                     st.dataframe(correlation_matrix)
                 
                 # Displaying the Heatmap
