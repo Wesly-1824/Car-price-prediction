@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import io
+import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
@@ -17,7 +18,7 @@ from sklearn.tree import DecisionTreeRegressor
 # Set the theme configuration
 st.set_page_config(
     page_title="Car Price Prediction",
-    page_icon="Logo.png",
+    page_icon="logo.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -136,22 +137,27 @@ def main():
                 Matrix = col1.checkbox("Correlation Matrix")
                 Heatmap = col2.checkbox("Heatmap")
 
-                if Heatmap:
-                    st.write('##### Intercorrelation Matrix Heatmap :')
-                    numeric_columns = car.select_dtypes(include=[np.number])
-                    numeric_columns = numeric_columns.drop(columns=['car_ID', 'symboling'])
-                    corr = numeric_columns.corr()
-                    with sns.axes_style("white"):
-                        fig, ax = plt.subplots(figsize=(7, 5))
-                        ax = sns.heatmap(corr, vmax=1, square=True)
-                    st.pyplot(fig)
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
+                
                 # Display the correlation matrix
                 if Matrix:
                     numerical_cols = car.select_dtypes(include=[np.number]).columns
                     correlation_matrix = car[numerical_cols].corr()
                     st.write("##### Correlation Matrix :")
                     st.dataframe(correlation_matrix)
+                
+                # Displaying the Heatmap
+                if Heatmap:
+                    numeric_columns = car.select_dtypes(include=[np.number])
+                    numeric_columns = numeric_columns.drop(columns=['car_ID', 'symboling'])
+                    corr = numeric_columns.corr()
+                    # Display the correlation matrix as an interactive heatmap
+                    st.write("##### Intercorrelation Matrix Heatmap:")
+                    fig = go.Figure(data=go.Heatmap(z=corr.values,
+                                                    x=numeric_columns.columns,
+                                                    y=numeric_columns.columns))
+                    fig.update_layout(width=700, height=500)  # Set the size of the heatmap
+                    st.plotly_chart(fig)
+
               
             if selected_option == 'Price Vs. Feature':
                 exclude_columns = ['symboling', 'car_ID', 'price']  # Replace with the actual column names you want to exclude
@@ -187,205 +193,9 @@ def main():
                 else:
                     st.write("Please select at least one column to know the price of selected feature(s).")
                 
-            elif selected_option == 'Other features':
-                col1, col2, col3,col4 = st.columns(4)
-                checkbox1 = col1.checkbox("Frequency of Cars sold")
-                checkbox2 = col1.checkbox("Price distribution of cars")
-                checkbox3 = col2.checkbox("Fuel type Ratio")
-                checkbox4 = col2.checkbox("Gas & Diesel vehicles")
-                checkbox5 = col3.checkbox("Aspiration")
-                checkbox6 = col3.checkbox("Turbo and Std aspiration")
-                checkbox7 = col4.checkbox("Door Number")
-                checkbox8 = col4.checkbox("Carbody")
-                checkbox9 = col1.checkbox("Engine type")
-                checkbox10 = col2.checkbox("Cylinder number")
-                checkbox11 = col3.checkbox("Fuel system")
-                checkbox12 = col4.checkbox("Car Length vs. Car Width")
-                if checkbox1:
-                    st.write("#### Visualise different car names")
-                    plt.figure(figsize=(25, 6))
-                    plt.subplot(1,3,1)
-                    plt1 = car.CompanyName.value_counts().plot(kind = 'bar', color='olive')
-                    plt.title('Frequency of Cars sold in American Markets')
-                    plt1.set(xlabel = 'Car Brands', ylabel='Frequency of cars sold')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                if checkbox3:
-                    st.write('##### Fuel type Ratio')
-                    df=pd.DataFrame(car['fueltype'].value_counts())
-                    fig, ax = plt.subplots(figsize=(5, 5))
-                    ax.pie(df['fueltype'], labels=df.index, autopct='%1.1f%%', colors=['steelblue', 'purple'])
-                    ax.set_title('Fuel Type Ratio')
-                    st.pyplot(fig)
-                if checkbox2:
-                    st.write('#### Distribution of Car Prices')
-                    plt.figure(figsize=(8, 6))
-                    sns.distplot(car['price'], kde=True, color='purple')
-                    # Adding labels and title
-                    plt.xlabel('Price')
-                    plt.ylabel('Density')
-                    plt.title('Distribution of Car Prices')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                if checkbox4:
-                    st.write('#### Distribution of price of gas vehicles and diesel vehicles')
-                    f = plt.figure(figsize=(12,5))
-                    ax = f.add_subplot(121)
-                    sns.distplot(car[car.fueltype == 'gas']['price'], color='gray', ax=ax)
-                    ax.set_title('Distribution of price of gas vehicles')
-                    ax = f.add_subplot(122)
-                    sns.distplot(car[car.fueltype == 'diesel']['price'], color='darkgreen', ax=ax)
-                    ax.set_title('Distribution of ages of diesel vehicles')
-                    st.pyplot(f)
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                    st.write('#### Box plot of Price by Fuel Type')
-                    plt.figure(figsize=(8, 6))
-                    sns.boxplot(x='fueltype', y='price', data=car, palette='magma')
-                    plt.title('Box plot of Price by Fuel Type')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                if checkbox5:
-                    # Display the pie chart for the "aspiration" column
-                    df_aspiration = pd.DataFrame(car['aspiration'].value_counts())
-                    fig, ax = plt.subplots(figsize=(5, 5))
-                    ax.pie(df_aspiration['aspiration'], labels=df_aspiration.index, autopct='%1.1f%%', colors=['cyan', 'orange'])
-                    ax.set_title('Aspiration Type Ratio')
-                    st.pyplot(fig)
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-
-                if checkbox6:
-                    st.write('#### Price distribution of Turbo and Std aspiration vehicles')
-                    f = plt.figure(figsize=(12, 5))
-                    ax = f.add_subplot(121)
-                    sns.distplot(car[car.aspiration == 'turbo']['price'], color='navy', ax=ax)
-                    ax.set_title('Price distribution of Turbo aspiration vehicles')
-                    ax = f.add_subplot(122)
-                    sns.distplot(car[car.aspiration == 'std']['price'], color='orange', ax=ax)
-                    ax.set_title('Price distribution of Std aspiration vehicles')
-                    st.pyplot(f)
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                    plt.figure(figsize=(10, 6))
-                    sns.boxplot(x='aspiration', y='price', data=car, palette='cividis')
-                    plt.title('Box plot of Price by Aspiration Type')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                    
-                if checkbox7:
-                    
-                     # Calculate the door number distribution
-                    df_doornumber = pd.DataFrame(car['doornumber'].value_counts())
-
-                    # Create a pie chart for door number distribution
-                    plt.figure(figsize=(5, 5))
-                    plt.pie(df_doornumber['doornumber'], labels=df_doornumber.index, autopct='%1.1f%%', colors=['m', 'y'])
-                    plt.title('Door Number Distribution')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                    f = plt.figure(figsize=(12, 5))
-                    # Price distribution of cars having two doors
-                    ax = f.add_subplot(121)
-                    sns.distplot(car[car.doornumber == 'two']["price"], color='darkgoldenrod', ax=ax)
-                    ax.set_title('Price distribution of cars having two doors')
-
-                    ax = f.add_subplot(122)
-                    sns.distplot(car[car.doornumber == 'four']['price'], color='darkblue', ax=ax)
-                    ax.set_title('Price distribution of cars having four doors')
-
-                    st.pyplot(f)
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                
-                if checkbox8:
-                    # Calculate the Carbody distribution
-                    df_carbody = pd.DataFrame(car['carbody'].value_counts())
-
-                    # Create a pie chart for Carbody distribution
-                    plt.figure(figsize=(8, 8))
-                    plt.pie(df_carbody['carbody'], labels=df_carbody.index, autopct='%1.1f%%', colors=sns.color_palette('pastel'))
-                    plt.title('Carbody Distribution')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                # Price distribution according to car body
-                    plt.figure(figsize=(8, 6))
-                    sns.boxplot(x='carbody', y='price', data=car, palette='hot')
-                    plt.title('Price Distribution According to Car Body')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                
-                if checkbox9:
-                    # Calculate the Engine type distribution
-                    df_enginetype = pd.DataFrame(car['enginetype'].value_counts())
-
-                    # Create a pie chart for Engine type distribution
-                    plt.figure(figsize=(8, 8))
-                    plt.pie(df_enginetype['enginetype'], labels=df_enginetype.index, autopct='%1.1f%%', colors=sns.color_palette('pastel'))
-                    plt.title('Engine Type Distribution')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                    # Price distribution according to engine type
-                    plt.figure(figsize=(8, 6))
-                    sns.boxplot(x='enginetype', y='price', data=car, palette='Accent')
-                    plt.title('Price Distribution According to Engine Type')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                
-                if checkbox10:
-                    # Calculate the Cylinder number distribution
-                    df_cylindernumber = pd.DataFrame(car['cylindernumber'].value_counts())
-
-                    # Create a pie chart for Cylinder number distribution
-                    plt.figure(figsize=(8, 8))
-                    plt.pie(df_cylindernumber['cylindernumber'], labels=df_cylindernumber.index, autopct='%1.1f%%', colors=sns.color_palette('cool'))
-                    plt.title('Cylinder Number Distribution')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                       # Price distribution according to cylinder number
-                    plt.figure(figsize=(8, 6))
-                    sns.boxplot(x='cylindernumber', y='price', data=car, palette='autumn')
-                    plt.title('Price Distribution According to Cylinder Number')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                    
-                if checkbox11:
-                    # Calculate the Fuel system distribution
-                    df_fuelsystem = pd.DataFrame(car['fuelsystem'].value_counts()).reset_index().rename(columns={'index': 'fuelsystem', 'fuelsystem': 'count'})
-
-                    # Create a bar plot for Fuel system distribution
-                    plt.figure(figsize=(10, 6))
-                    sns.barplot(x='fuelsystem', y='count', data=df_fuelsystem)
-                    plt.title('Fuel System Distribution')
-                    plt.xlabel('Fuel System')
-                    plt.ylabel('Count')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                # Price distribution according to fuel system
-                    plt.figure(figsize=(10, 6))
-                    sns.boxplot(x='fuelsystem', y='price', data=car, palette='gist_rainbow')
-                    plt.title('Price Distribution According to Fuel System')
-                    plt.xlabel('Fuel System')
-                    plt.ylabel('Price')
-                    st.pyplot(plt.gcf())
-                    st.set_option('deprecation.showPyplotGlobalUse', False)
-                
-                if checkbox12:
-                     # Scatter plot of Car Length vs. Car Width
-                        plt.figure(figsize=(10, 6))
-                        sns.scatterplot(x="carlength", y="carwidth", data=car, color='b')
-                        plt.title("Car Length vs. Car Width")
-                        plt.xlabel("Car Length")
-                        plt.ylabel("Car Width")
-                        st.pyplot(plt.gcf())
-                        st.set_option('deprecation.showPyplotGlobalUse', False)
-                    # Joint plot of Car Length vs. Car Width
-                        plt.figure(figsize=(10, 6))
-                        g = sns.jointplot(x="carwidth", y="carlength", data=car, kind="kde", color="pink")
-                        g.plot_joint(plt.scatter, c="w", s=30, linewidth=1, marker="+")
-                        g.ax_joint.collections[0].set_alpha(0)
-                        g.set_axis_labels("Car Width", "Car Length")
-                        st.pyplot(plt.gcf())
-                        st.set_option('deprecation.showPyplotGlobalUse', False)
             
             
-            elif selected_option == 'Generic Features':
+            elif selected_option == 'Features':
                 # Create a dropdown to select the features for the pie chart
                 feature_options = [col for col in car.columns if col not in ['price', 'car_ID', 'symboling', 'CompanyName']]
                 selected_columns = st.selectbox("Select Feature column(s):", feature_options)
@@ -395,8 +205,7 @@ def main():
                     histogram = col1.checkbox("Histogram")
                     pie = col2.checkbox("Pie chart")
                     bar = col3.checkbox("Bar graph")
-                    
-                    
+                                    
                     if histogram:
                         # Histogram
                         plt.figure(figsize=(8, 6))
@@ -404,19 +213,23 @@ def main():
                         plt.xlabel(selected_columns)
                         plt.ylabel('Frequency')
                         plt.title(f"Histogram of {selected_columns}")
-                        st.pyplot(use_container_width=True)
-                        
-                   # Generate the pie chart for the selected feature
+                        col1.pyplot(use_container_width=True)
+                        st.set_option('deprecation.showPyplotGlobalUse', False)
+
+                                        
                     if pie:
+                        # Generate the pie chart for the selected feature
                         feature_counts = car[selected_columns].value_counts()
                         plt.figure(figsize=(8, 6))
                         plt.pie(feature_counts, labels=feature_counts.index, autopct="%1.1f%%", startangle=140)
                         plt.axis('equal')
                         plt.title(f"Distribution of {selected_columns}")
-                        st.pyplot(use_container_width=True)
+                        col2.pyplot(use_container_width=True)
+                        st.set_option('deprecation.showPyplotGlobalUse', False)
+                                    
                     if bar:
                         plt.figure(figsize=(8, 6))
-                         # Convert index values to strings
+                        # Convert index values to strings
                         feature_counts = car[selected_columns].value_counts()
                         feature_labels = [str(label) for label in feature_counts.index]
                         plt.bar(feature_labels, feature_counts)
@@ -424,14 +237,15 @@ def main():
                         plt.ylabel('Frequency')
                         plt.title(f"Bar Graph of {selected_columns}")
                         plt.xticks(rotation=45)
-                        st.pyplot(use_container_width=True)
-                   
+                        col3.pyplot(use_container_width=True)
+                        st.set_option('deprecation.showPyplotGlobalUse', False)
+
                 
 
         # Create the expander with a maximum width of 800 pixels
         with st.expander("Visualisation"):
             # Create the radio buttons
-            selected_option = st.radio("Select an option", ('Intercorrelation', 'Price Vs. Feature', 'Generic Features'), index=1, horizontal=True)
+            selected_option = st.radio("Select an option", ('Intercorrelation', 'Price Vs. Feature', 'Features'), index=1, horizontal=True)
             display_option_data(selected_option)
 
 if __name__ == '__main__':
