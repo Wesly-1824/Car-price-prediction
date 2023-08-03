@@ -208,37 +208,32 @@ def main():
                                     
                     if histogram:
                         # Histogram
-                        plt.figure(figsize=(8, 6))
-                        plt.hist(car[selected_columns], bins=10, edgecolor='black')
-                        plt.xlabel(selected_columns)
-                        plt.ylabel('Frequency')
-                        plt.title(f"Histogram of {selected_columns}")
-                        col1.pyplot(use_container_width=True)
+                    
+                        # Convert the Matplotlib histogram to a Plotly histogram
+                        fig = go.Figure(data=[go.Histogram(x=car[selected_columns], nbinsx=10)])
+                        fig.update_layout(title_text=f"Histogram of {selected_columns}", xaxis_title=selected_columns, yaxis_title="Frequency")
+                        col1.plotly_chart(fig, use_container_width=True)
                         st.set_option('deprecation.showPyplotGlobalUse', False)
+
 
                                         
                     if pie:
                         # Generate the pie chart for the selected feature
+                        # Generate the pie chart for the selected feature
                         feature_counts = car[selected_columns].value_counts()
-                        plt.figure(figsize=(8, 6))
-                        plt.pie(feature_counts, labels=feature_counts.index, autopct="%1.1f%%", startangle=140)
-                        plt.axis('equal')
-                        plt.title(f"Distribution of {selected_columns}")
-                        col2.pyplot(use_container_width=True)
-                        st.set_option('deprecation.showPyplotGlobalUse', False)
+                        fig = go.Figure(data=[go.Pie(labels=feature_counts.index, values=feature_counts)])
+                        fig.update_traces(textposition='inside', textinfo='percent+label')
+                        fig.update_layout(title=f"Distribution of {selected_columns}")
+                        col2.plotly_chart(fig, use_container_width=True)
                                     
                     if bar:
                         plt.figure(figsize=(8, 6))
                         # Convert index values to strings
                         feature_counts = car[selected_columns].value_counts()
-                        feature_labels = [str(label) for label in feature_counts.index]
-                        plt.bar(feature_labels, feature_counts)
-                        plt.xlabel(selected_columns)
-                        plt.ylabel('Frequency')
-                        plt.title(f"Bar Graph of {selected_columns}")
-                        plt.xticks(rotation=45)
-                        col3.pyplot(use_container_width=True)
-                        st.set_option('deprecation.showPyplotGlobalUse', False)
+                        fig = go.Figure(data=[go.Bar(x=feature_counts.index, y=feature_counts)])
+                        fig.update_layout(title=f"Bar Graph of {selected_columns}", xaxis_title=selected_columns, yaxis_title='Frequency')
+                        col3.plotly_chart(fig, use_container_width=True)
+
 
                 
 
