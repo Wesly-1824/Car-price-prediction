@@ -14,7 +14,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LinearRegression, Lasso, Ridge, HuberRegressor
 from sklearn.tree import DecisionTreeRegressor
 
-
 # Set the theme configuration
 st.set_page_config(
     page_title="Car Price Prediction",
@@ -23,8 +22,82 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Define custom CSS styles
+custom_styles = """
+<style>
+body {
+    background-color: #f2f2f2;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.sidebar .stAccordion {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.stButton {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.stButton:hover {
+    background-color: #0056b3;
+}
+
+.dataframe {
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.dataframe th, .dataframe td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.dataframe th {
+    background-color: #f2f2f2;
+}
+
+.subheader {
+    font-size: 24px;
+    margin-top: 30px;
+}
+
+
+
+/* Add more custom styles here */
+
+</style>
+"""
+
 def main():
-    st.title("Car Price Prediction Model")
+    st.markdown(custom_styles,
+            unsafe_allow_html=True
+        )
+     # Display the main title with custom styles
+    st.markdown("<h2 style='text-align:center; color:#007BFF;'>Car Price Prediction Model</h2>", unsafe_allow_html=True)
+
+    
     st.write("Upload an Excel or CSV file")
 
     # Upload the Excel file using Streamlit file uploader
@@ -116,7 +189,7 @@ def main():
         st.write('**Data:** ' + str(car.shape[0]) + ' rows and ' + str(car.shape[1]) + ' columns.')
         st.dataframe(car)
 
-        st.subheader("Regression Model Evaluation Results")
+        st.subheader("Regression Model Evaluation Results:")
         if 'R2 Score (Test)' in eval_df.columns:
             # Set the desired height and width using CSS style
             eval_df_html = eval_df['R2 Score (Test)'].to_frame().to_html()
@@ -196,7 +269,7 @@ def main():
                 
             
             
-            elif selected_option == 'Features':
+            elif selected_option == 'Other Features':
                 # Create a dropdown to select the features for the pie chart
                 feature_options = [col for col in car.columns if col not in ['price', 'car_ID', 'symboling', 'CompanyName']]
                 selected_columns = st.selectbox("Select Feature column(s):", feature_options)
@@ -241,8 +314,8 @@ def main():
         # Create the expander with a maximum width of 800 pixels
         with st.expander("Visualisation"):
             # Create the radio buttons
-            selected_option = st.radio("Select an option", ('Intercorrelation', 'Price Vs. Feature', 'Features'), index=1, horizontal=True)
+            selected_option = st.radio("Select an option", ('Intercorrelation', 'Price Vs. Feature', 'Other Features'), index=1, horizontal=True)
             display_option_data(selected_option)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
