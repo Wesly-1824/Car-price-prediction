@@ -252,17 +252,18 @@ def main():
                     chart_idx = 0
                     
                     for column in selected_columns:
-                    
-                        # Create a bar chart for each selected column against the "price" column
+                    # Create a bar chart for each selected column against the "price" column
                         with chart_layout[chart_idx % num_cols]:
-                            
-                            plt.figure(figsize=(8, 5))
-                            ax = sns.barplot(x=car[column], y=car["price"])
-                            ax.set_xlabel(column)
-                            ax.set_ylabel("Price")
-                            ax.set_title(f"{column} vs Price")
-                            st.pyplot(plt.gcf())
-
+                            avg_price_by_feature = car.groupby(column)["price"].mean().reset_index()
+                            fig = go.Figure(data=[go.Bar(x=avg_price_by_feature[column], y=avg_price_by_feature["price"])])
+                            fig.update_layout(
+                                title=f"Average Price vs {column}",
+                                xaxis_title=column,
+                                yaxis_title="Average Price",
+                                width=400,  # Set the width of the plot (adjust as needed)
+                                height=300,  # Set the height of the plot (adjust as needed)
+                            )
+                            st.plotly_chart(fig, use_container_width=True)  # Use container width
                         chart_idx += 1
                 else:
                     st.write("Please select at least one column to know the price of selected feature(s).")
