@@ -234,7 +234,7 @@ def main():
 
               
             if selected_option == 'Price Vs. Feature':
-                exclude_columns = ['symboling', 'car_ID', 'price']  # Replace with the actual column names you want to exclude
+                exclude_columns = ['symboling', 'car_ID', 'price','CompanyName']  # Replace with the actual column names you want to exclude
                 column_names = [col for col in car.columns.tolist() if col not in exclude_columns]
 
                 # Create a Streamlit multiselect dropdown and populate it with the column names
