@@ -95,7 +95,7 @@ def main():
             unsafe_allow_html=True
         )
      # Display the main title with custom styles
-    st.markdown("<h2 style='text-align:center; color:#007BFF;'>Car Price Prediction Model</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:center; color:#007BFF;'>CAR SALES ANALYTICS</h2>", unsafe_allow_html=True)
 
     
     st.write("Upload an Excel or CSV file")
@@ -234,7 +234,7 @@ def main():
 
               
             if selected_option == 'Price Vs. Feature':
-                exclude_columns = ['symboling', 'car_ID', 'price','CompanyName']  # Replace with the actual column names you want to exclude
+                exclude_columns = ['symboling', 'car_ID', 'price', 'CompanyName']  # Replace with the actual column names you want to exclude
                 column_names = [col for col in car.columns.tolist() if col not in exclude_columns]
 
                 # Create a Streamlit multiselect dropdown and populate it with the column names
@@ -252,7 +252,7 @@ def main():
                     chart_idx = 0
                     
                     for column in selected_columns:
-                    # Create a bar chart for each selected column against the "price" column
+                        # Create a bar chart for each selected column against the "price" column
                         with chart_layout[chart_idx % num_cols]:
                             avg_price_by_feature = car.groupby(column)["price"].mean().reset_index()
                             fig = go.Figure(data=[go.Bar(x=avg_price_by_feature[column], y=avg_price_by_feature["price"])])
@@ -264,6 +264,7 @@ def main():
                                 height=300,  # Set the height of the plot (adjust as needed)
                             )
                             st.plotly_chart(fig, use_container_width=True)  # Use container width
+
                         chart_idx += 1
                 else:
                     st.write("Please select at least one column to know the price of selected feature(s).")
