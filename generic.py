@@ -16,7 +16,7 @@ from sklearn.tree import DecisionTreeRegressor
 
 # Set the theme configuration
 st.set_page_config(
-    page_title="Car Price Prediction",
+    page_title="Car Sales Analytics",
     page_icon="logo.png",
     layout="wide",
     initial_sidebar_state="expanded",
